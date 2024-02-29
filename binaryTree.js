@@ -76,7 +76,17 @@ class Tree {
 					// If the data to delete is a leaf
 					if(currentNode.left == null && currentNode.right == null){
 						console.log(data, " is a leaf node.")
-						currentNode = null;
+						console.log("Current node is : ", currentNode);
+
+						if(previousNode === null){
+							this.root = null;
+						}
+						else if(data < previousNode.data){
+							previousNode.left = null;
+						}
+						else if(data > previousNode.data){
+							previousNode.right = null;
+						}
 						nodeDeleted = true;
 					}
 					// If the data to delete has only one child
@@ -95,8 +105,23 @@ class Tree {
 					else if(currentNode.left !== null && currentNode.right !== null){
 						console.log(data, " has two children : ", currentNode.left.data, " and ", currentNode.right.data);
 						// Get in order successor in right part of the array
-						this.inOrderSuccessor(currentNode);
+						let {previousSuccessor, orderedSuccessor} = this.inOrderSuccessor(currentNode);
 
+
+						previousSuccessor.left = null;
+						orderedSuccessor.left = currentNode.left;
+						orderedSuccessor.right = currentNode.right;
+
+						if(previousNode === null){
+							this.root = orderedSuccessor;
+						}
+						else if(data < previousNode.data){
+							previousNode.left = orderedSuccessor;
+						}
+						else if(data > previousNode.data){
+							previousNode.right = orderedSuccessor;
+						}
+						currentNode = null;
 						nodeDeleted = true;
 					}
 				}
@@ -105,19 +130,21 @@ class Tree {
 	};
 
 	inOrderSuccessor(root = this.root){
-		let successorFound = false;
-		let successorDiff = null;
 		let initialValue = root.data;
 
-		while (!successorFound) {
-			var rightDiff = root.right.data - initialValue;
-			var leftDiff = root.left.data - initialValue;
-			console.log(initialValue, " leftDiff : ", leftDiff, " rightDiff : ", rightDiff);
-			root = leftDiff < 0 ? root.right : root.left;
-			if(leftDiff < 0){
-				successorDiff = rightDiff;
-			}
+		// Get the right branch from the root
+		let rootRightBranch = root.right;
+
+		// Get the leftmost node from the right branch
+		let leftMostNode = rootRightBranch;
+		let previousNode = null;
+		while (leftMostNode.left !== null) {
+			// Keep track of previous node
+			previousNode = leftMostNode;
+			leftMostNode = leftMostNode.left;
 		}
+
+		return {previousSuccessor: previousNode, orderedSuccessor: leftMostNode};
 	}
 
 	prettyPrint(node = this.root, prefix = "", isLeft = true) {
@@ -145,6 +172,21 @@ binaryTree.delete(6);
 binaryTree.delete(2);
 binaryTree.prettyPrint();
 
+binaryTree.insert(8);
+binaryTree.prettyPrint();
+
 binaryTree.delete(7);
+binaryTree.prettyPrint();
+binaryTree.delete(8);
+binaryTree.prettyPrint();
+binaryTree.delete(4);
+binaryTree.prettyPrint();
+binaryTree.delete(1);
+binaryTree.prettyPrint();
+
+
+binaryTree.delete(-1);
+binaryTree.prettyPrint();
+binaryTree.delete(120);
 binaryTree.prettyPrint();
 
